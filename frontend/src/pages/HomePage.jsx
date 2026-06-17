@@ -12,7 +12,7 @@ function formatDate(dateStr) {
 function EventCard({ event }) {
   const navigate = useNavigate()
   const imageUrl = event.cover_image
-    ? `http://localhost:8000${event.cover_image}`
+    ? event.cover_image
     : null
 
   return (
