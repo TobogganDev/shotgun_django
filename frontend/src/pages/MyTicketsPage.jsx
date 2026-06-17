@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import api from '../api/axios'
 
+const API_BASE = import.meta.env.VITE_API_URL ?? 'http://localhost:8000'
+
 const STATUS_STYLES = {
   confirmed: { color: '#22c55e', label: 'Confirmé' },
   pending:   { color: '#f97316', label: 'En attente' },
@@ -62,17 +64,24 @@ export default function MyTicketsPage() {
                   {formatDate(ticket.event.date)}
                 </p>
                 <p style={{ color: 'var(--text)', fontSize: '0.85rem' }}>{ticket.event.location}</p>
-                <code style={{
-                  marginTop: '0.5rem',
-                  fontSize: '0.8rem',
-                  color: 'var(--text)',
-                  background: 'var(--bg-input)',
-                  border: '1px solid var(--border)',
-                  borderRadius: 6,
-                  padding: '0.4rem 0.75rem',
-                  letterSpacing: '0.5px',
-                  wordBreak: 'break-all',
-                }}>{ticket.ticket_code}</code>
+                <div style={{ marginTop: '0.75rem', display: 'flex', alignItems: 'flex-start', gap: '1rem', flexWrap: 'wrap' }}>
+                  <img
+                    src={`${API_BASE}/api/tickets/${ticket.ticket_code}/qr/`}
+                    alt="QR code billet"
+                    style={{ width: 96, height: 96, borderRadius: 8, background: '#fff', padding: 4 }}
+                  />
+                  <code style={{
+                    alignSelf: 'center',
+                    fontSize: '0.78rem',
+                    color: 'var(--text)',
+                    background: 'var(--bg-input)',
+                    border: '1px solid var(--border)',
+                    borderRadius: 6,
+                    padding: '0.4rem 0.75rem',
+                    letterSpacing: '0.5px',
+                    wordBreak: 'break-all',
+                  }}>{ticket.ticket_code}</code>
+                </div>
               </div>
             )
           })}

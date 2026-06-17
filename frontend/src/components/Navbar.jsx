@@ -65,6 +65,9 @@ export default function Navbar() {
 
 				<div className="navbar-links">
 					<Link to="/">Événements</Link>
+					{user?.role === 'attendee' && (
+						<Link to="/my-tickets">Mes billets</Link>
+					)}
 					{user?.role === 'organizer' && (
 						<Link to="/dashboard">Dashboard</Link>
 					)}
