@@ -30,8 +30,8 @@ export function AuthProvider({ children }) {
     setUser(me.data)
   }
 
-  async function register(username, email, password) {
-    const { data } = await api.post('/api/auth/register/', { username, email, password })
+  async function register(username, email, password, role = 'attendee') {
+    const { data } = await api.post('/api/auth/register/', { username, email, password, role })
     localStorage.setItem('access', data.access)
     localStorage.setItem('refresh', data.refresh)
     setUser(data.user)

@@ -11,10 +11,15 @@ function parseApiError(err) {
   return Object.values(data).flat().join(' ')
 }
 
+const ROLES = [
+  { value: 'attendee', label: 'Participant', description: 'Je veux découvrir et rejoindre des événements.' },
+  { value: 'organizer', label: 'Organisateur', description: 'Je veux créer et gérer des événements.' },
+]
+
 export default function RegisterPage() {
   const { register } = useAuth()
   const navigate = useNavigate()
-  const [fields, setFields] = useState({ username: '', email: '', password: '' })
+  const [fields, setFields] = useState({ username: '', email: '', password: '', role: 'attendee' })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
 
@@ -27,7 +32,7 @@ export default function RegisterPage() {
     setLoading(true)
     setError(null)
     try {
-      await register(fields.username, fields.email, fields.password)
+      await register(fields.username, fields.email, fields.password, fields.role)
       navigate('/')
     } catch (err) {
       setError(parseApiError(err))
@@ -48,40 +53,40 @@ export default function RegisterPage() {
           <div className={styles.field}>
             <label htmlFor="username">Nom d'utilisateur</label>
             <input
-              id="username"
-              name="username"
-              type="text"
-              placeholder="johndoe"
-              value={fields.username}
-              onChange={handleChange}
-              required
-              autoFocus
+              id="username" name="username" type="text" placeholder="johndoe"
+              value={fields.username} onChange={handleChange} required autoFocus
             />
           </div>
           <div className={styles.field}>
             <label htmlFor="email">Email</label>
             <input
-              id="email"
-              name="email"
-              type="email"
-              placeholder="john@exemple.com"
-              value={fields.email}
-              onChange={handleChange}
-              required
+              id="email" name="email" type="email" placeholder="john@exemple.com"
+              value={fields.email} onChange={handleChange} required
             />
           </div>
           <div className={styles.field}>
             <label htmlFor="password">Mot de passe</label>
             <input
-              id="password"
-              name="password"
-              type="password"
-              placeholder="8 caractères minimum"
-              value={fields.password}
-              onChange={handleChange}
-              required
-              minLength={8}
+              id="password" name="password" type="password" placeholder="8 caractères minimum"
+              value={fields.password} onChange={handleChange} required minLength={8}
             />
+          </div>
+
+          <div className={styles.field}>
+            <label>Je suis…</label>
+            <div className={styles.roleGrid}>
+              {ROLES.map(r => (
+                <button
+                  key={r.value}
+                  type="button"
+                  className={`${styles.roleCard} ${fields.role === r.value ? styles.roleCardActive : ''}`}
+                  onClick={() => setFields(f => ({ ...f, role: r.value }))}
+                >
+                  <span className={styles.roleLabel}>{r.label}</span>
+                  <span className={styles.roleDesc}>{r.description}</span>
+                </button>
+              ))}
+            </div>
           </div>
 
           {error && <div className={styles.errorBox}>{error}</div>}
