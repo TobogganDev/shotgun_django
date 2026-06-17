@@ -65,12 +65,20 @@ export default function Navbar() {
 
 				<div className="navbar-links">
 					<Link to="/">Événements</Link>
+					{user?.role === 'organizer' && (
+						<Link to="/dashboard">Dashboard</Link>
+					)}
 				</div>
 			</div>
 
 			<div className="navbar-auth">
 				{user ? (
-					<UserMenu user={user} onLogout={handleLogout} />
+					<>
+						{user.role === 'organizer' && (
+							<Link to="/dashboard#create" className="btn-primary">+ Créer</Link>
+						)}
+						<UserMenu user={user} onLogout={handleLogout} />
+					</>
 				) : (
 					<>
 						<Link to="/login" className="btn-login">Login</Link>

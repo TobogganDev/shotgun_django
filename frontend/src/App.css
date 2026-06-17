@@ -52,6 +52,12 @@
 	letter-spacing: 0.3px;
 }
 
+.navbar-links {
+	display: flex;
+	align-items: center;
+	gap: 1.5rem;
+}
+
 .navbar-links a {
 	color: var(--text);
 	font-size: 0.95rem;

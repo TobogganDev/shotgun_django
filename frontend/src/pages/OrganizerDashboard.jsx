@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { useLocation } from 'react-router-dom'
 import api from '../api/axios'
 import { useAuth } from '../context/AuthContext'
 
@@ -16,11 +17,18 @@ function formatDate(dateStr) {
 
 export default function OrganizerDashboard() {
   const { user } = useAuth()
+  const { hash } = useLocation()
   const [events, setEvents] = useState([])
   const [form, setForm] = useState(EMPTY_FORM)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState(null)
   const fileRef = useRef(null)
+
+  useEffect(() => {
+    if (hash === '#create') {
+      setTimeout(() => document.getElementById('create')?.scrollIntoView({ behavior: 'smooth' }), 100)
+    }
+  }, [hash])
 
   function fetchEvents() {
     api.get('/api/events/').then(({ data }) => {
@@ -129,7 +137,7 @@ export default function OrganizerDashboard() {
       </section>
 
       {/* Créer un événement */}
-      <section>
+      <section id="create">
         <h2 style={{ marginBottom: '1.25rem' }}>Créer un événement</h2>
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
