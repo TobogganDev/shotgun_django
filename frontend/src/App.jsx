@@ -31,6 +31,7 @@ function AppRoutes() {
       />
       <div style={{ position: 'relative', zIndex: 1 }}>
       <Navbar />
+      <div className="page-container">
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/events/:id" element={<EventDetailPage />} />
@@ -43,6 +44,7 @@ function AppRoutes() {
           <PrivateRoute><MyTicketsPage /></PrivateRoute>
         } />
       </Routes>
+      </div>
       </div>
     </div>
   )
