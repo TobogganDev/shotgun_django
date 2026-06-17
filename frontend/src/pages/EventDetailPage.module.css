@@ -1,0 +1,186 @@
+.page {
+  flex: 1;
+  padding-bottom: 4rem;
+}
+
+.cover {
+  position: relative;
+  height: 380px;
+  overflow: hidden;
+}
+
+.cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.coverFallback {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #1e1040, #3b0764, #2d1b4e);
+}
+
+.coverOverlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, transparent 40%, var(--bg) 100%);
+}
+
+.content {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+.meta {
+  display: flex;
+  gap: 1.5rem;
+  margin-bottom: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.metaDate {
+  font-size: 0.9rem;
+  color: var(--purple);
+  text-transform: capitalize;
+}
+
+.metaLocation {
+  font-size: 0.9rem;
+  color: var(--text);
+}
+
+.title {
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  margin-bottom: 1rem;
+}
+
+.infoRow {
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.price {
+  font-size: 1.4rem;
+  font-weight: 800;
+  background: var(--gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.spotsLeft {
+  font-size: 0.9rem;
+  color: var(--text);
+}
+
+.spotsOut {
+  font-size: 0.9rem;
+  color: var(--pink);
+  font-weight: 600;
+}
+
+.description {
+  color: var(--text);
+  line-height: 1.8;
+  margin-bottom: 2.5rem;
+  white-space: pre-line;
+}
+
+.registerSection {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.registerBtn {
+  padding: 0.85rem 2.5rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 700;
+  background: var(--gradient);
+  color: #fff;
+  transition: opacity 0.2s, transform 0.15s;
+}
+
+.registerBtn:hover:not(:disabled) {
+  opacity: 0.88;
+  transform: translateY(-1px);
+}
+
+.registerBtn:disabled {
+  background: var(--border);
+  color: var(--text);
+  cursor: not-allowed;
+  transform: none;
+}
+
+.registerError {
+  color: var(--pink);
+  font-size: 0.9rem;
+}
+
+.loginHint {
+  color: var(--text);
+  font-size: 0.88rem;
+}
+
+.loginLink {
+  color: var(--purple);
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.confirmBox {
+  background: rgba(139, 92, 246, 0.1);
+  border: 1px solid rgba(139, 92, 246, 0.35);
+  border-radius: var(--radius);
+  padding: 1.5rem 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.confirmTitle {
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--text-primary);
+}
+
+.confirmSub {
+  font-size: 0.85rem;
+  color: var(--text);
+}
+
+.ticketCode {
+  font-family: ui-monospace, monospace;
+  font-size: 0.9rem;
+  color: var(--purple);
+  letter-spacing: 1px;
+  word-break: break-all;
+}
+
+.center {
+  display: flex;
+  justify-content: center;
+  padding: 6rem 0;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--border);
+  border-top-color: var(--purple);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}

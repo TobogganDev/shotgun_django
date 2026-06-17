@@ -1,0 +1,82 @@
+import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import api from '../api/axios'
+import styles from './HomePage.module.css'
+
+function formatDate(dateStr) {
+  return new Intl.DateTimeFormat('fr-FR', {
+    weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
+  }).format(new Date(dateStr))
+}
+
+function EventCard({ event }) {
+  const navigate = useNavigate()
+  const imageUrl = event.cover_image
+    ? `http://localhost:8000${event.cover_image}`
+    : null
+
+  return (
+    <article className={styles.card} onClick={() => navigate(`/events/${event.id}`)}>
+      <div className={styles.cardImage}>
+        {imageUrl
+          ? <img src={imageUrl} alt={event.title} />
+          : <div className={styles.cardImageFallback} />
+        }
+        {event.is_sold_out && <span className={styles.soldOutBadge}>COMPLET</span>}
+      </div>
+      <div className={styles.cardBody}>
+        <h2 className={styles.cardTitle}>{event.title}</h2>
+        <p className={styles.cardDate}>{formatDate(event.date)}</p>
+        <p className={styles.cardLocation}>{event.location}</p>
+        <div className={styles.cardFooter}>
+          <span className={styles.cardPrice}>
+            {event.price === '0.00' || event.price === 0 ? 'Gratuit' : `${event.price} €`}
+          </span>
+          <span className={event.is_sold_out ? styles.spotsOut : styles.spotsLeft}>
+            {event.is_sold_out ? 'Complet' : `${event.spots_left} places restantes`}
+          </span>
+        </div>
+      </div>
+    </article>
+  )
+}
+
+export default function HomePage() {
+  const [events, setEvents] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+
+  useEffect(() => {
+    api.get('/api/events/')
+      .then(({ data }) => setEvents(data))
+      .catch(() => setError('Impossible de charger les événements.'))
+      .finally(() => setLoading(false))
+  }, [])
+
+  return (
+    <main className={styles.page}>
+      <header className={styles.hero}>
+        <h1>Les meilleurs événements<br /><span className={styles.accent}>près de chez toi</span></h1>
+        <p>Découvre, réserve, profite.</p>
+      </header>
+
+      {loading && (
+        <div className={styles.center}>
+          <div className={styles.spinner} />
+        </div>
+      )}
+
+      {error && <p className={styles.errorMsg}>{error}</p>}
+
+      {!loading && !error && events.length === 0 && (
+        <p className={styles.empty}>Aucun événement disponible pour le moment.</p>
+      )}
+
+      {!loading && !error && events.length > 0 && (
+        <div className={styles.grid}>
+          {events.map(event => <EventCard key={event.id} event={event} />)}
+        </div>
+      )}
+    </main>
+  )
+}
