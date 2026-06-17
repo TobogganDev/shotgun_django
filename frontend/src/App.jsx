@@ -14,6 +14,14 @@ function PrivateRoute({ children }) {
   return user ? children : <Navigate to="/login" replace />
 }
 
+function OrganizerRoute({ children }) {
+  const { user, loading } = useAuth()
+  if (loading) return null
+  if (!user) return <Navigate to="/login" replace />
+  if (user.role !== 'organizer') return <Navigate to="/" replace />
+  return children
+}
+
 function AppRoutes() {
   return (
     <div style={{ position: 'relative' }}>
@@ -38,7 +46,7 @@ function AppRoutes() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/dashboard" element={
-          <PrivateRoute><OrganizerDashboard /></PrivateRoute>
+          <OrganizerRoute><OrganizerDashboard /></OrganizerRoute>
         } />
         <Route path="/my-tickets" element={
           <PrivateRoute><MyTicketsPage /></PrivateRoute>

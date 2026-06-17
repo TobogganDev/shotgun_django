@@ -27,8 +27,12 @@ function UserMenu({ user, onLogout }) {
 
 			{open && (
 				<div className="user-dropdown">
-					<Link to="/my-tickets" onClick={() => setOpen(false)}>Mes billets</Link>
-					<Link to="/dashboard" onClick={() => setOpen(false)}>Dashboard</Link>
+					{user.role === 'attendee' && (
+						<Link to="/my-tickets" onClick={() => setOpen(false)}>Mes billets</Link>
+					)}
+					{user.role === 'organizer' && (
+						<Link to="/dashboard" onClick={() => setOpen(false)}>Dashboard</Link>
+					)}
 					<div className="user-dropdown-divider" />
 					<button onClick={onLogout}>Se déconnecter</button>
 				</div>
