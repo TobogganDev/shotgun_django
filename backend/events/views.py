@@ -7,7 +7,14 @@ from .models import Event
 from .serializers import EventSerializer
 
 
-class IsOrganizerOrReadOnly(permissions.BasePermission):
+class IsOrganizer(permissions.BasePermission):
+    def has_permission(self, request, view):
+        if request.method in permissions.SAFE_METHODS:
+            return True
+        return request.user.is_authenticated and request.user.profile.role == 'organizer'
+
+
+class IsEventOrganizer(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
         if request.method in permissions.SAFE_METHODS:
             return True
@@ -16,11 +23,14 @@ class IsOrganizerOrReadOnly(permissions.BasePermission):
 
 class EventViewSet(viewsets.ModelViewSet):
     serializer_class = EventSerializer
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly, IsOrganizerOrReadOnly)
+    permission_classes = (IsOrganizer, IsEventOrganizer)
 
     def get_queryset(self):
         if self.action == 'list':
-            return Event.objects.filter(is_published=True)
+            qs = Event.objects.filter(is_published=True)
+            if self.request.user.is_authenticated:
+                qs = (qs | Event.objects.filter(organizer=self.request.user)).distinct()
+            return qs
         return Event.objects.all()
 
     def perform_create(self, serializer):
