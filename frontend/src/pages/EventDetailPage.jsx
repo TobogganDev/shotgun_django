@@ -5,13 +5,15 @@ import api from "../api/axios";
 import { useAuth } from "../context/AuthContext";
 import styles from "./EventDetailPage.module.css";
 
-function formatShortDate(dateStr) {
-	const d = new Date(dateStr);
+function formatShortDate(start, end) {
+	const d = new Date(start);
 	const weekday = new Intl.DateTimeFormat("fr-FR", { weekday: "short" }).format(d);
 	const day = d.getDate();
 	const month = new Intl.DateTimeFormat("fr-FR", { month: "short" }).format(d);
 	const time = new Intl.DateTimeFormat("fr-FR", { hour: "2-digit", minute: "2-digit" }).format(d);
-	return `${weekday} ${day} ${month}. à ${time}`;
+	if (!end) return `${weekday} ${day} ${month}. à ${time}`;
+	const endTime = new Intl.DateTimeFormat("fr-FR", { hour: "2-digit", minute: "2-digit" }).format(new Date(end));
+	return `${weekday} ${day} ${month}. de ${time} à ${endTime}`;
 }
 
 function formatPrice(price) {
@@ -85,7 +87,7 @@ export default function EventDetailPage() {
 					<div className={styles.metaBlock}>
 						<div className={styles.metaRow}>
 							<Calendar className={styles.icon} size={18} />
-							<span className={styles.metaText}>Le {formatShortDate(event.date)}</span>
+							<span className={styles.metaText}>Le {formatShortDate(event.date, event.end_date)}</span>
 						</div>
 					</div>
 

@@ -4,15 +4,17 @@ import api from '../api/axios'
 import { useAuth } from '../context/AuthContext'
 
 const EMPTY_FORM = {
-  title: '', description: '', date: '', location: '',
+  title: '', description: '', date: '', end_date: '', location: '',
   capacity: '', price: '0', is_published: false, cover_image: null,
 }
 
-function formatDate(dateStr) {
-  return new Intl.DateTimeFormat('fr-FR', {
-    day: 'numeric', month: 'long', year: 'numeric',
-    hour: '2-digit', minute: '2-digit',
-  }).format(new Date(dateStr))
+function formatDateRange(start, end) {
+  const fmt = (d) => new Intl.DateTimeFormat('fr-FR', {
+    day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit',
+  }).format(new Date(d))
+  const fmtTime = (d) => new Intl.DateTimeFormat('fr-FR', { hour: '2-digit', minute: '2-digit' }).format(new Date(d))
+  if (!end) return fmt(start)
+  return `${fmt(start)} → ${fmtTime(end)}`
 }
 
 export default function OrganizerDashboard() {
@@ -53,6 +55,7 @@ export default function OrganizerDashboard() {
       const body = new FormData()
       Object.entries(form).forEach(([k, v]) => {
         if (k === 'cover_image') { if (v) body.append(k, v) }
+        else if (k === 'end_date' && !v) { /* skip empty end_date */ }
         else body.append(k, v)
       })
       await api.post('/api/events/', body, { headers: { 'Content-Type': 'multipart/form-data' } })
@@ -103,7 +106,7 @@ export default function OrganizerDashboard() {
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
                   <span style={{ fontWeight: 700 }}>{ev.title}</span>
                   <span style={{ fontSize: '0.82rem', color: 'var(--purple)', textTransform: 'capitalize' }}>
-                    {formatDate(ev.date)}
+                    {formatDateRange(ev.date, ev.end_date)}
                   </span>
                   <div style={{ display: 'flex', gap: '1rem', fontSize: '0.82rem', color: 'var(--text)' }}>
                     <span>{ev.spots_left} places restantes</span>
@@ -150,8 +153,12 @@ export default function OrganizerDashboard() {
               <input name="location" value={form.location} onChange={handleChange} required style={inputStyle} />
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
-              <label style={{ fontSize: '0.82rem', color: 'var(--text)', fontWeight: 600 }}>Date *</label>
+              <label style={{ fontSize: '0.82rem', color: 'var(--text)', fontWeight: 600 }}>Début *</label>
               <input name="date" type="datetime-local" value={form.date} onChange={handleChange} required style={inputStyle} />
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+              <label style={{ fontSize: '0.82rem', color: 'var(--text)', fontWeight: 600 }}>Fin</label>
+              <input name="end_date" type="datetime-local" value={form.end_date} onChange={handleChange} style={inputStyle} />
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
               <label style={{ fontSize: '0.82rem', color: 'var(--text)', fontWeight: 600 }}>Capacité *</label>

@@ -3,10 +3,14 @@ import { useNavigate } from 'react-router-dom'
 import api from '../api/axios'
 import styles from './HomePage.module.css'
 
-function formatDate(dateStr) {
-  return new Intl.DateTimeFormat('fr-FR', {
+function formatDate(start, end) {
+  const base = new Intl.DateTimeFormat('fr-FR', {
     weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
-  }).format(new Date(dateStr))
+  }).format(new Date(start))
+  const startTime = new Intl.DateTimeFormat('fr-FR', { hour: '2-digit', minute: '2-digit' }).format(new Date(start))
+  if (!end) return `${base} à ${startTime}`
+  const endTime = new Intl.DateTimeFormat('fr-FR', { hour: '2-digit', minute: '2-digit' }).format(new Date(end))
+  return `${base} · ${startTime} → ${endTime}`
 }
 
 function EventCard({ event }) {
@@ -26,7 +30,7 @@ function EventCard({ event }) {
       </div>
       <div className={styles.cardBody}>
         <h2 className={styles.cardTitle}>{event.title}</h2>
-        <p className={styles.cardDate}>{formatDate(event.date)}</p>
+        <p className={styles.cardDate}>{formatDate(event.date, event.end_date)}</p>
         <p className={styles.cardLocation}>{event.location}</p>
         <div className={styles.cardFooter}>
           <span className={styles.cardPrice}>

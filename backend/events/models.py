@@ -7,6 +7,7 @@ class Event(models.Model):
     description = models.TextField()
     organizer = models.ForeignKey(User, on_delete=models.CASCADE)
     date = models.DateTimeField()
+    end_date = models.DateTimeField(null=True, blank=True)
     location = models.CharField(max_length=300)
     cover_image = models.ImageField(upload_to='events/')
     capacity = models.PositiveIntegerField()

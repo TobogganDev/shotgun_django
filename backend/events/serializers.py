@@ -11,7 +11,7 @@ class EventSerializer(serializers.ModelSerializer):
         model = Event
         fields = (
             'id', 'title', 'description', 'organizer',
-            'date', 'location', 'cover_image', 'capacity',
+            'date', 'end_date', 'location', 'cover_image', 'capacity',
             'price', 'is_published', 'created_at',
             'is_sold_out', 'spots_left',
         )
