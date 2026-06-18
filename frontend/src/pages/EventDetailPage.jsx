@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Calendar, House, Heart } from "lucide-react";
+import { Calendar, House, Heart, Clock } from "lucide-react";
 import api from "../api/axios";
 import { useAuth } from "../context/AuthContext";
 import styles from "./EventDetailPage.module.css";
@@ -33,6 +33,8 @@ export default function EventDetailPage() {
 	const [registerError, setRegisterError] = useState(null);
 	const [interested, setInterested] = useState(false);
 	const [interestedCount, setInterestedCount] = useState(0);
+	const [waitlistPosition, setWaitlistPosition] = useState(null);
+	const [waitlistLoading, setWaitlistLoading] = useState(false);
 
 	useEffect(() => {
 		api.get(`/api/events/${id}/`)
@@ -40,18 +42,28 @@ export default function EventDetailPage() {
 				setEvent(data);
 				setInterested(data.is_interested ?? false);
 				setInterestedCount(data.interested_count ?? 0);
+				if (data.is_sold_out && user) {
+					api.get(`/api/events/${id}/waitlist_position/`)
+						.then(({ data: wl }) => setWaitlistPosition(wl.position))
+						.catch(() => setWaitlistPosition(null));
+				}
 			})
 			.catch(() => navigate("/"))
 			.finally(() => setLoading(false));
-	}, [id, navigate]);
+	}, [id, navigate, user]);
 
 	async function handleInterest() {
-		if (!user) { navigate("/login"); return; }
+		if (!user) {
+			navigate("/login");
+			return;
+		}
 		try {
 			const { data } = await api.post(`/api/events/${id}/interest/`);
 			setInterested(data.interested);
 			setInterestedCount(data.interested_count);
-		} catch { /* ignore */ }
+		} catch {
+			/* ignore */
+		}
 	}
 
 	async function handleRegister() {
@@ -72,6 +84,36 @@ export default function EventDetailPage() {
 		}
 	}
 
+	async function handleJoinWaitlist() {
+		if (!user) {
+			navigate("/login");
+			return;
+		}
+		setWaitlistLoading(true);
+		try {
+			const { data } = await api.post(`/api/events/${id}/join_waitlist/`);
+			setWaitlistPosition(data.position);
+		} catch (err) {
+			const detail = err.response?.data?.detail;
+			setRegisterError(detail || "Une erreur est survenue.");
+		} finally {
+			setWaitlistLoading(false);
+		}
+	}
+
+	async function handleLeaveWaitlist() {
+		if (!confirm("Quitter la liste d'attente ?")) return;
+		setWaitlistLoading(true);
+		try {
+			await api.delete(`/api/events/${id}/leave_waitlist/`);
+			setWaitlistPosition(null);
+		} catch {
+			/* ignore */
+		} finally {
+			setWaitlistLoading(false);
+		}
+	}
+
 	if (loading) {
 		return (
 			<div className={styles.center}>
@@ -84,6 +126,7 @@ export default function EventDetailPage() {
 
 	const imageUrl = event.cover_image || null;
 	const isFree = !event.price || event.price === "0.00" || event.price === 0;
+	const onWaitlist = waitlistPosition !== null;
 
 	return (
 		<main className={styles.page}>
@@ -122,17 +165,38 @@ export default function EventDetailPage() {
 								<p className={styles.confirmSub}>Ton code billet :</p>
 								<code className={styles.ticketCode}>{confirmation}</code>
 							</div>
+						) : event.is_sold_out ? (
+							onWaitlist ? (
+								<div className={styles.waitlistBox}>
+									<div className={styles.waitlistHeader}>
+										<Clock size={16} className={styles.waitlistIcon} />
+										<span className={styles.waitlistTitle}>Sur la liste d'attente</span>
+									</div>
+									<p className={styles.waitlistPos}>
+										Position <strong>#{waitlistPosition}</strong>
+									</p>
+									<button className={styles.leaveWaitlistBtn} onClick={handleLeaveWaitlist} disabled={waitlistLoading}>
+										{waitlistLoading ? "Chargement…" : "Quitter la liste d'attente"}
+									</button>
+								</div>
+							) : (
+								<>
+									<button className={styles.buyBtn} disabled>
+										COMPLET
+									</button>
+									<button className={styles.waitlistBtn} onClick={handleJoinWaitlist} disabled={waitlistLoading}>
+										{waitlistLoading ? "Chargement…" : "LISTE D'ATTENTE"}
+									</button>
+								</>
+							)
 						) : (
 							<>
-								<button className={styles.buyBtn} onClick={handleRegister} disabled={event.is_sold_out || registering}>
-									{event.is_sold_out ? "COMPLET" : registering ? "INSCRIPTION…" : isFree ? "GRATUIT" : formatPrice(event.price)}
+								<button className={styles.buyBtn} onClick={handleRegister} disabled={registering}>
+									{registering ? "INSCRIPTION…" : isFree ? "GRATUIT" : formatPrice(event.price)}
 								</button>
-								<button
-									className={`${styles.interestedBtn} ${interested ? styles.interestedActive : ''}`}
-									onClick={handleInterest}
-								>
-									<Heart className={styles.heartIcon} size={15} fill={interested ? 'currentColor' : 'none'} />
-									{interested ? 'INTÉRESSÉ·E' : 'INTÉRESSÉ·E'}
+								<button className={`${styles.interestedBtn} ${interested ? styles.interestedActive : ""}`} onClick={handleInterest}>
+									<Heart className={styles.heartIcon} size={15} fill={interested ? "currentColor" : "none"} />
+									{interested ? "INTÉRESSÉ·E" : "INTÉRESSÉ·E"}
 									{interestedCount > 0 && <span className={styles.interestedCount}>{interestedCount}</span>}
 								</button>
 							</>

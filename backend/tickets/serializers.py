@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Registration
+from .models import Registration, WaitlistEntry
 
 
 class EventBriefSerializer(serializers.Serializer):
@@ -24,3 +24,12 @@ class RegistrantSerializer(serializers.ModelSerializer):
     class Meta:
         model = Registration
         fields = ('id', 'username', 'email', 'status', 'quantity', 'registered_at')
+
+
+class WaitlistEntrySerializer(serializers.ModelSerializer):
+    event = EventBriefSerializer(read_only=True)
+    position = serializers.IntegerField(read_only=True)
+
+    class Meta:
+        model = WaitlistEntry
+        fields = ('id', 'event', 'position', 'joined_at')

@@ -68,7 +68,10 @@ class EventViewSet(viewsets.ModelViewSet):
         event = self.get_object()
 
         if event.is_sold_out:
-            return Response({'detail': "Cet événement est complet."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {'detail': "Cet événement est complet.", 'waitlist_available': True},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         if Registration.objects.filter(event=event, user=request.user, status='confirmed').exists():
             return Response({'detail': "Vous êtes déjà inscrit à cet événement."}, status=status.HTTP_400_BAD_REQUEST)
@@ -79,3 +82,43 @@ class EventViewSet(viewsets.ModelViewSet):
             status='confirmed',
         )
         return Response({'detail': "Inscription confirmée.", 'ticket_code': str(registration.ticket_code)}, status=status.HTTP_201_CREATED)
+
+    @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
+    def join_waitlist(self, request, pk=None):
+        from tickets.models import WaitlistEntry
+        event = self.get_object()
+
+        if not event.is_sold_out:
+            return Response({'detail': "L'événement n'est pas complet. Inscrivez-vous directement."}, status=status.HTTP_400_BAD_REQUEST)
+
+        if Registration.objects.filter(event=event, user=request.user, status='confirmed').exists():
+            return Response({'detail': "Vous êtes déjà inscrit à cet événement."}, status=status.HTTP_400_BAD_REQUEST)
+
+        entry, created = WaitlistEntry.objects.get_or_create(event=event, user=request.user)
+        if not created:
+            return Response({'detail': "Vous êtes déjà sur la liste d'attente."}, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response({'detail': "Ajouté à la liste d'attente.", 'position': entry.position}, status=status.HTTP_201_CREATED)
+
+    @action(detail=True, methods=['delete'], permission_classes=[permissions.IsAuthenticated])
+    def leave_waitlist(self, request, pk=None):
+        from tickets.models import WaitlistEntry
+        event = self.get_object()
+
+        deleted, _ = WaitlistEntry.objects.filter(event=event, user=request.user).delete()
+        if not deleted:
+            return Response({'detail': "Vous n'êtes pas sur la liste d'attente."}, status=status.HTTP_404_NOT_FOUND)
+
+        return Response({'detail': "Retiré de la liste d'attente."})
+
+    @action(detail=True, methods=['get'], permission_classes=[permissions.IsAuthenticated])
+    def waitlist_position(self, request, pk=None):
+        from tickets.models import WaitlistEntry
+        event = self.get_object()
+
+        try:
+            entry = WaitlistEntry.objects.get(event=event, user=request.user)
+        except WaitlistEntry.DoesNotExist:
+            return Response({'detail': "Vous n'êtes pas sur la liste d'attente."}, status=status.HTTP_404_NOT_FOUND)
+
+        return Response({'position': entry.position, 'joined_at': entry.joined_at})

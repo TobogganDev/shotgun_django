@@ -1,291 +1,383 @@
 .page {
-  flex: 1;
-  padding-bottom: 5rem;
+	flex: 1;
+	padding-bottom: 5rem;
 }
 
 /* Breadcrumb */
 .breadcrumb {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 1.5rem 0 2rem;
-  font-size: 0.85rem;
-  color: var(--text);
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	padding: 1.5rem 0 2rem;
+	font-size: 0.85rem;
+	color: var(--text);
 }
 
 .breadcrumbLink {
-  background: none;
-  border: none;
-  color: var(--text);
-  font-family: var(--sans);
-  font-size: 0.85rem;
-  cursor: pointer;
-  padding: 0;
-  transition: color 0.15s;
+	background: none;
+	border: none;
+	color: var(--text);
+	font-family: var(--sans);
+	font-size: 0.85rem;
+	cursor: pointer;
+	padding: 0;
+	transition: color 0.15s;
 }
 
 .breadcrumbLink:hover {
-  color: var(--text-primary);
+	color: var(--text-primary);
 }
 
 .breadcrumbSep {
-  color: var(--border);
-  font-size: 1rem;
+	color: var(--border);
+	font-size: 1rem;
 }
 
 .breadcrumbCurrent {
-  color: var(--text-primary);
-  font-weight: 500;
+	color: var(--text-primary);
+	font-weight: 500;
 }
 
 /* Hero */
 .hero {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 4rem;
-  align-items: start;
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 4rem;
+	align-items: start;
 }
 
 /* Left: Info */
 .info {
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
+	display: flex;
+	flex-direction: column;
+	gap: 1.25rem;
 }
 
 .title {
-  font-size: clamp(2rem, 4vw, 3.2rem);
-  font-weight: 800;
-  letter-spacing: -0.5px;
-  text-transform: uppercase;
-  line-height: 1.1;
-  color: var(--text-primary);
+	font-size: clamp(2rem, 4vw, 3.2rem);
+	font-weight: 800;
+	letter-spacing: -0.5px;
+	text-transform: uppercase;
+	line-height: 1.1;
+	color: var(--text-primary);
 }
 
 .metaBlock {
-  display: flex;
-  flex-direction: column;
-  gap: 0.6rem;
+	display: flex;
+	flex-direction: column;
+	gap: 0.6rem;
 }
 
 .metaRow {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
 }
 
 .icon {
-  width: 18px;
-  height: 18px;
-  flex-shrink: 0;
-  color: var(--text);
+	width: 18px;
+	height: 18px;
+	flex-shrink: 0;
+	color: var(--text);
 }
 
 .metaText {
-  font-size: 1rem;
-  color: var(--text-primary);
-  font-weight: 500;
+	font-size: 1rem;
+	color: var(--text-primary);
+	font-weight: 500;
 }
 
 .divider {
-  border: none;
-  border-top: 1px solid var(--border);
-  margin: 0;
+	border: none;
+	border-top: 1px solid var(--border);
+	margin: 0;
 }
 
 /* Actions */
 .actions {
-  display: flex;
-  gap: 0.75rem;
-  align-items: center;
-  flex-wrap: wrap;
-  margin-top: 0.5rem;
+	display: flex;
+	gap: 0.75rem;
+	align-items: center;
+	flex-wrap: wrap;
+	margin-top: 0.5rem;
 }
 
 .buyBtn {
-  padding: 0.8rem 1.5rem;
-  border-radius: 6px;
-  font-size: 0.85rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  background: var(--text-primary);
-  color: #111;
-  border: none;
-  transition: opacity 0.15s, transform 0.12s;
-  white-space: nowrap;
+	padding: 0.8rem 1.5rem;
+	border-radius: 6px;
+	font-size: 0.85rem;
+	font-weight: 700;
+	letter-spacing: 0.04em;
+	background: var(--text-primary);
+	color: #111;
+	border: none;
+	transition:
+		opacity 0.15s,
+		transform 0.12s;
+	white-space: nowrap;
 }
 
 .buyBtn:hover:not(:disabled) {
-  opacity: 0.9;
-  transform: translateY(-1px);
+	opacity: 0.9;
+	transform: translateY(-1px);
 }
 
 .buyBtn:disabled {
-  background: var(--border);
-  color: var(--text);
-  cursor: not-allowed;
+	background: var(--border);
+	color: var(--text);
+	cursor: not-allowed;
 }
 
 .interestedBtn {
-  display: flex;
-  align-items: center;
-  gap: 0.45rem;
-  padding: 0.8rem 1.25rem;
-  border-radius: 6px;
-  font-size: 0.85rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  background: transparent;
-  color: var(--text-primary);
-  border: 1.5px solid rgba(255, 255, 255, 0.25);
-  transition: border-color 0.15s, background 0.15s;
+	display: flex;
+	align-items: center;
+	gap: 0.45rem;
+	padding: 0.8rem 1.25rem;
+	border-radius: 6px;
+	font-size: 0.85rem;
+	font-weight: 700;
+	letter-spacing: 0.04em;
+	background: transparent;
+	color: var(--text-primary);
+	border: 1.5px solid rgba(255, 255, 255, 0.25);
+	transition:
+		border-color 0.15s,
+		background 0.15s;
 }
 
 .interestedBtn:hover {
-  border-color: rgba(255, 255, 255, 0.5);
-  background: rgba(255, 255, 255, 0.05);
+	border-color: rgba(255, 255, 255, 0.5);
+	background: rgba(255, 255, 255, 0.05);
 }
 
 .interestedActive {
-  border-color: var(--pink);
-  color: var(--pink);
-  background: rgba(252, 155, 234, 0.08);
+	border-color: var(--pink);
+	color: var(--pink);
+	background: rgba(252, 155, 234, 0.08);
 }
 
 .interestedActive:hover {
-  border-color: var(--pink);
-  background: rgba(252, 155, 234, 0.14);
+	border-color: var(--pink);
+	background: rgba(252, 155, 234, 0.14);
 }
 
 .interestedCount {
-  background: rgba(255,255,255,0.1);
-  border-radius: 999px;
-  padding: 0.05rem 0.45rem;
-  font-size: 0.75rem;
-  font-weight: 700;
-  letter-spacing: 0;
+	background: rgba(255, 255, 255, 0.1);
+	border-radius: 999px;
+	padding: 0.05rem 0.45rem;
+	font-size: 0.75rem;
+	font-weight: 700;
+	letter-spacing: 0;
 }
 
 .heartIcon {
-  width: 15px;
-  height: 15px;
-  flex-shrink: 0;
+	width: 15px;
+	height: 15px;
+	flex-shrink: 0;
 }
 
 .spotsText {
-  font-size: 0.88rem;
-  color: var(--text);
-  margin-top: -0.25rem;
+	font-size: 0.88rem;
+	color: var(--text);
+	margin-top: -0.25rem;
 }
 
 .registerError {
-  color: var(--pink);
-  font-size: 0.9rem;
+	color: var(--pink);
+	font-size: 0.9rem;
 }
 
 .loginHint {
-  color: var(--text);
-  font-size: 0.85rem;
+	color: var(--text);
+	font-size: 0.85rem;
 }
 
 .loginLink {
-  color: var(--purple);
-  cursor: pointer;
-  text-decoration: underline;
+	color: var(--purple);
+	cursor: pointer;
+	text-decoration: underline;
+}
+
+/* Waitlist button */
+.waitlistBtn {
+	padding: 0.8rem 1.5rem;
+	border-radius: 6px;
+	font-size: 0.85rem;
+	font-weight: 700;
+	letter-spacing: 0.04em;
+	background: transparent;
+	color: #f97316;
+	border: 1.5px solid #f9731655;
+	transition:
+		border-color 0.15s,
+		background 0.15s;
+	white-space: nowrap;
+}
+
+.waitlistBtn:hover:not(:disabled) {
+	border-color: #f97316;
+	background: rgba(249, 115, 22, 0.08);
+}
+
+.waitlistBtn:disabled {
+	opacity: 0.5;
+	cursor: not-allowed;
+}
+
+/* Waitlist box (when already queued) */
+.waitlistBox {
+	background: rgba(249, 115, 22, 0.08);
+	border: 1px solid rgba(249, 115, 22, 0.35);
+	border-radius: var(--radius);
+	padding: 1.25rem 1.5rem;
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+}
+
+.waitlistHeader {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+}
+
+.waitlistIcon {
+	color: #f97316;
+	flex-shrink: 0;
+}
+
+.waitlistTitle {
+	font-weight: 700;
+	font-size: 0.95rem;
+	color: #f97316;
+}
+
+.waitlistPos {
+	font-size: 0.88rem;
+	color: var(--text-primary);
+}
+
+.leaveWaitlistBtn {
+	align-self: flex-start;
+	background: transparent;
+	border: 1px solid rgba(249, 115, 22, 0.4);
+	color: #f97316;
+	border-radius: 6px;
+	padding: 0.3rem 0.875rem;
+	font-size: 0.8rem;
+	font-family: var(--sans);
+	font-weight: 600;
+	cursor: pointer;
+	transition:
+		border-color 0.15s,
+		background 0.15s;
+	margin-top: 0.25rem;
+}
+
+.leaveWaitlistBtn:hover:not(:disabled) {
+	border-color: #f97316;
+	background: rgba(249, 115, 22, 0.1);
+}
+
+.leaveWaitlistBtn:disabled {
+	opacity: 0.5;
+	cursor: not-allowed;
 }
 
 /* Confirmation */
 .confirmBox {
-  background: rgba(139, 92, 246, 0.1);
-  border: 1px solid rgba(139, 92, 246, 0.35);
-  border-radius: var(--radius);
-  padding: 1.5rem 2rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+	background: rgba(139, 92, 246, 0.1);
+	border: 1px solid rgba(139, 92, 246, 0.35);
+	border-radius: var(--radius);
+	padding: 1.5rem 2rem;
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
 }
 
 .confirmTitle {
-  font-weight: 700;
-  font-size: 1.1rem;
-  color: var(--text-primary);
+	font-weight: 700;
+	font-size: 1.1rem;
+	color: var(--text-primary);
 }
 
 .confirmSub {
-  font-size: 0.85rem;
-  color: var(--text);
+	font-size: 0.85rem;
+	color: var(--text);
 }
 
 .ticketCode {
-  font-family: ui-monospace, monospace;
-  font-size: 0.9rem;
-  color: var(--purple);
-  letter-spacing: 1px;
-  word-break: break-all;
+	font-family: ui-monospace, monospace;
+	font-size: 0.9rem;
+	color: var(--purple);
+	letter-spacing: 1px;
+	word-break: break-all;
 }
 
 /* Right: Image */
 .imageWrapper {
-  border-radius: 12px;
-  overflow: hidden;
-  background: var(--bg-card);
+	border-radius: 12px;
+	overflow: hidden;
+	background: var(--bg-card);
 }
 
 .eventImage {
-  width: 100%;
-  height: auto;
-  display: block;
-  image-orientation: none;
+	width: 100%;
+	height: auto;
+	display: block;
+	image-orientation: none;
 }
 
 .imageFallback {
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(135deg, #1e1040, #3b0764, #2d1b4e);
+	width: 100%;
+	height: 100%;
+	background: linear-gradient(135deg, #1e1040, #3b0764, #2d1b4e);
 }
 
 /* Description */
 .descSection {
-  max-width: 700px;
-  margin-top: 3.5rem;
+	max-width: 700px;
+	margin-top: 3.5rem;
 }
 
 .description {
-  color: var(--text);
-  line-height: 1.8;
-  white-space: pre-line;
-  font-size: 0.95rem;
+	color: var(--text);
+	line-height: 1.8;
+	white-space: pre-line;
+	font-size: 0.95rem;
 }
 
 /* Loading */
 .center {
-  display: flex;
-  justify-content: center;
-  padding: 6rem 0;
+	display: flex;
+	justify-content: center;
+	padding: 6rem 0;
 }
 
 .spinner {
-  width: 36px;
-  height: 36px;
-  border: 3px solid var(--border);
-  border-top-color: var(--purple);
-  border-radius: 50%;
-  animation: spin 0.7s linear infinite;
+	width: 36px;
+	height: 36px;
+	border: 3px solid var(--border);
+	border-top-color: var(--purple);
+	border-radius: 50%;
+	animation: spin 0.7s linear infinite;
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+	to {
+		transform: rotate(360deg);
+	}
 }
 
 /* Responsive */
 @media (max-width: 768px) {
-  .hero {
-    grid-template-columns: 1fr;
-    gap: 2rem;
-  }
+	.hero {
+		grid-template-columns: 1fr;
+		gap: 2rem;
+	}
 
-  .imageWrapper {
-    aspect-ratio: 4 / 3;
-    order: -1;
-  }
+	.imageWrapper {
+		aspect-ratio: 4 / 3;
+		order: -1;
+	}
 }
