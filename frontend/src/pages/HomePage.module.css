@@ -27,114 +27,143 @@
   font-size: 1.1rem;
 }
 
+/* ── Filters ─────────────────────────────────────── */
+.filters {
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+  margin-bottom: 2rem;
+}
+
+.searchWrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.searchIcon {
+  position: absolute;
+  left: 1rem;
+  color: var(--text);
+  pointer-events: none;
+  flex-shrink: 0;
+}
+
+.searchInput {
+  width: 100%;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text-primary);
+  font-family: var(--sans);
+  font-size: 0.95rem;
+  padding: 0.75rem 2.75rem 0.75rem 2.75rem;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.searchInput::placeholder {
+  color: var(--text);
+}
+
+.searchInput:focus {
+  border-color: var(--purple);
+}
+
+.searchClear {
+  position: absolute;
+  right: 0.875rem;
+  background: none;
+  border: none;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  padding: 0.25rem;
+  border-radius: 4px;
+  transition: color 0.15s;
+}
+
+.searchClear:hover {
+  color: var(--text-primary);
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.chipDivider {
+  width: 1px;
+  height: 1.25rem;
+  background: var(--border);
+  margin-inline: 0.25rem;
+}
+
+.chip {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 0.82rem;
+  font-weight: 500;
+  padding: 0.35rem 0.875rem;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  white-space: nowrap;
+}
+
+.chip:hover {
+  border-color: var(--purple);
+  color: var(--text-primary);
+}
+
+.chipActive {
+  background: var(--purple);
+  border-color: var(--purple);
+  color: #1c1c1c;
+  font-weight: 600;
+}
+
+.chipReset {
+  background: none;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 0.82rem;
+  font-weight: 500;
+  padding: 0.35rem 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  transition: color 0.15s;
+}
+
+.chipReset:hover {
+  color: var(--pink);
+}
+
+.resultCount {
+  font-size: 0.82rem;
+  color: var(--text);
+  margin-bottom: 1rem;
+}
+
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 4rem 0;
+}
+
+/* ── Grid ─────────────────────────────────────────── */
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 1.5rem;
-}
-
-.card {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  overflow: hidden;
-  cursor: pointer;
-  transition: transform 0.2s, border-color 0.2s;
-}
-
-.card:hover {
-  transform: translateY(-4px);
-  border-color: var(--purple);
-}
-
-.cardImage {
-  position: relative;
-  aspect-ratio: 16 / 9;
-  overflow: hidden;
-}
-
-.cardImage img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.3s;
-}
-
-.card:hover .cardImage img {
-  transform: scale(1.04);
-}
-
-.cardImageFallback {
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(135deg, #1e1040, #2d1b4e);
-}
-
-.soldOutBadge {
-  position: absolute;
-  top: 0.75rem;
-  right: 0.75rem;
-  background: rgba(236, 72, 153, 0.9);
-  color: #fff;
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 1px;
-  padding: 0.25rem 0.6rem;
-  border-radius: 4px;
-}
-
-.cardBody {
-  padding: 1.25rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
-}
-
-.cardTitle {
-  font-size: 1.05rem;
-  font-weight: 700;
-  color: var(--text-primary);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.cardDate {
-  font-size: 0.82rem;
-  color: var(--purple);
-  text-transform: capitalize;
-}
-
-.cardLocation {
-  font-size: 0.85rem;
-  color: var(--text);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.cardFooter {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 0.5rem;
-}
-
-.cardPrice {
-  font-size: 0.9rem;
-  font-weight: 700;
-  color: var(--text-primary);
-}
-
-.spotsLeft {
-  font-size: 0.78rem;
-  color: var(--text);
-}
-
-.spotsOut {
-  font-size: 0.78rem;
-  color: var(--pink);
-  font-weight: 600;
 }
 
 .center {
@@ -156,12 +185,13 @@
   to { transform: rotate(360deg); }
 }
 
-.empty, .errorMsg {
+.empty {
   text-align: center;
-  padding: 4rem 0;
   color: var(--text);
 }
 
 .errorMsg {
+  text-align: center;
+  padding: 4rem 0;
   color: var(--pink);
 }

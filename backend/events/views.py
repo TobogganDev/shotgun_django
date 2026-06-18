@@ -4,7 +4,7 @@ from rest_framework.response import Response
 
 from tickets.models import Registration
 from .models import Event
-from .serializers import EventSerializer
+from .serializers import EventSerializer, AttendeeSerializer
 
 
 class IsOrganizer(permissions.BasePermission):
@@ -35,6 +35,39 @@ class EventViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(organizer=self.request.user)
+
+    @action(detail=True, methods=['get'], permission_classes=[permissions.IsAuthenticated])
+    def attendees(self, request, pk=None):
+        event = self.get_object()
+        if event.organizer != request.user:
+            return Response({'detail': "Accès refusé."}, status=status.HTTP_403_FORBIDDEN)
+
+        registrations = event.registrations.select_related('user').order_by('-registered_at')
+        serializer = AttendeeSerializer(registrations, many=True)
+        confirmed = sum(1 for r in registrations if r.status == 'confirmed')
+        return Response({
+            'total': registrations.count(),
+            'confirmed': confirmed,
+            'attendees': serializer.data,
+        })
+
+    @action(detail=False, methods=['get'], permission_classes=[permissions.IsAuthenticated])
+    def my_interests(self, request):
+        events = request.user.interested_events.filter(is_published=True).order_by('-created_at')
+        serializer = self.get_serializer(events, many=True)
+        return Response(serializer.data)
+
+    @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
+    def interest(self, request, pk=None):
+        event = self.get_object()
+        user = request.user
+        if event.interested_users.filter(pk=user.pk).exists():
+            event.interested_users.remove(user)
+            interested = False
+        else:
+            event.interested_users.add(user)
+            interested = True
+        return Response({'interested': interested, 'interested_count': event.interested_users.count()})
 
     @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
     def register(self, request, pk=None):

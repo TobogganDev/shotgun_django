@@ -7,6 +7,7 @@ import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
 import OrganizerDashboard from './pages/OrganizerDashboard'
 import MyTicketsPage from './pages/MyTicketsPage'
+import MyInterestsPage from './pages/MyInterestsPage'
 
 function PrivateRoute({ children }) {
   const { user, loading } = useAuth()
@@ -50,6 +51,9 @@ function AppRoutes() {
         } />
         <Route path="/my-tickets" element={
           <PrivateRoute><MyTicketsPage /></PrivateRoute>
+        } />
+        <Route path="/my-interests" element={
+          <PrivateRoute><MyInterestsPage /></PrivateRoute>
         } />
       </Routes>
       </div>

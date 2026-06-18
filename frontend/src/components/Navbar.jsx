@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { Heart } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import "../App.css";
 
@@ -27,6 +28,7 @@ function UserMenu({ user, onLogout }) {
 
 			{open && (
 				<div className="user-dropdown">
+					<Link to="/my-interests" onClick={() => setOpen(false)}>Mes coups de cœur</Link>
 					{user.role === 'attendee' && (
 						<Link to="/my-tickets" onClick={() => setOpen(false)}>Mes billets</Link>
 					)}
@@ -69,6 +71,12 @@ export default function Navbar() {
 
 				<div className="navbar-links">
 					<Link to="/">Événements</Link>
+					{user && (
+						<Link to="/my-interests" style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+							<Heart size={13} />
+							Intérêts
+						</Link>
+					)}
 					{user?.role === 'attendee' && (
 						<Link to="/my-tickets">Mes billets</Link>
 					)}

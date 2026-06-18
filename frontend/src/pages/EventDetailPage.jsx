@@ -31,13 +31,28 @@ export default function EventDetailPage() {
 	const [registering, setRegistering] = useState(false);
 	const [confirmation, setConfirmation] = useState(null);
 	const [registerError, setRegisterError] = useState(null);
+	const [interested, setInterested] = useState(false);
+	const [interestedCount, setInterestedCount] = useState(0);
 
 	useEffect(() => {
 		api.get(`/api/events/${id}/`)
-			.then(({ data }) => setEvent(data))
+			.then(({ data }) => {
+				setEvent(data);
+				setInterested(data.is_interested ?? false);
+				setInterestedCount(data.interested_count ?? 0);
+			})
 			.catch(() => navigate("/"))
 			.finally(() => setLoading(false));
 	}, [id, navigate]);
+
+	async function handleInterest() {
+		if (!user) { navigate("/login"); return; }
+		try {
+			const { data } = await api.post(`/api/events/${id}/interest/`);
+			setInterested(data.interested);
+			setInterestedCount(data.interested_count);
+		} catch { /* ignore */ }
+	}
 
 	async function handleRegister() {
 		if (!user) {
@@ -112,9 +127,13 @@ export default function EventDetailPage() {
 								<button className={styles.buyBtn} onClick={handleRegister} disabled={event.is_sold_out || registering}>
 									{event.is_sold_out ? "COMPLET" : registering ? "INSCRIPTION…" : isFree ? "GRATUIT" : formatPrice(event.price)}
 								</button>
-								<button className={styles.interestedBtn}>
-									<Heart className={styles.heartIcon} size={15} />
-									INTÉRESSÉ·E
+								<button
+									className={`${styles.interestedBtn} ${interested ? styles.interestedActive : ''}`}
+									onClick={handleInterest}
+								>
+									<Heart className={styles.heartIcon} size={15} fill={interested ? 'currentColor' : 'none'} />
+									{interested ? 'INTÉRESSÉ·E' : 'INTÉRESSÉ·E'}
+									{interestedCount > 0 && <span className={styles.interestedCount}>{interestedCount}</span>}
 								</button>
 							</>
 						)}

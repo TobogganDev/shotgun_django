@@ -27,6 +27,9 @@ ATTENDEES = [
     ('ethan', 'ethan@example.com', 'Ethan', 'Moreau'),
     ('fiona', 'fiona@example.com', 'Fiona', 'Garcia'),
     ('george', 'george@example.com', 'George', 'Bernard'),
+    ('hugo', 'hugo@example.com', 'Hugo', 'Rousseau'),
+    ('isabelle', 'isabelle@example.com', 'Isabelle', 'Clement'),
+    ('julien', 'julien@example.com', 'Julien', 'Fontaine'),
 ]
 
 EVENTS = [
@@ -118,6 +121,7 @@ class Command(BaseCommand):
 
         events = self._create_events(organizers)
         self._create_registrations(events, attendees)
+        self._create_interests(events, attendees)
 
         self.stdout.write(self.style.SUCCESS(
             f'\nSeed complete: {len(organizers)} organizers, {len(attendees)} attendees, '
@@ -184,16 +188,74 @@ class Command(BaseCommand):
         return events
 
     def _create_registrations(self, events, attendees):
-        statuses = ['confirmed', 'confirmed', 'confirmed', 'pending', 'cancelled']
-        for event in events:
-            # Register a random subset of attendees for each event.
-            sample = random.sample(attendees, k=random.randint(2, len(attendees)))
-            for attendee in sample:
-                Registration.objects.get_or_create(
-                    event=event,
-                    user=attendee,
-                    defaults={
-                        'status': random.choice(statuses),
-                        'quantity': random.randint(1, 3),
-                    },
-                )
+        # Deterministic registrations: each entry is (event_index, attendee_index, status, quantity).
+        # event_index matches the EVENTS list order.
+        REGISTRATIONS = [
+            # Festival Électro (0) — grosse capacité, beaucoup de monde
+            (0, 0, 'confirmed', 2),  # charlie x2
+            (0, 1, 'confirmed', 1),  # diana
+            (0, 2, 'confirmed', 3),  # ethan x3
+            (0, 3, 'pending',   1),  # fiona
+            (0, 4, 'confirmed', 2),  # george x2
+            (0, 5, 'confirmed', 1),  # hugo
+            (0, 6, 'cancelled', 1),  # isabelle (annulé)
+            (0, 7, 'confirmed', 2),  # julien x2
+            # Conférence Tech (1) — pro, prix élevé
+            (1, 0, 'confirmed', 1),  # charlie
+            (1, 1, 'confirmed', 1),  # diana
+            (1, 2, 'pending',   1),  # ethan
+            (1, 5, 'confirmed', 1),  # hugo
+            (1, 6, 'confirmed', 1),  # isabelle
+            (1, 7, 'cancelled', 1),  # julien (annulé)
+            # Concert Jazz (2) — petite salle, quasi complet
+            (2, 0, 'confirmed', 2),  # charlie x2
+            (2, 1, 'confirmed', 1),  # diana
+            (2, 3, 'confirmed', 2),  # fiona x2
+            (2, 4, 'confirmed', 1),  # george
+            (2, 5, 'pending',   1),  # hugo
+            (2, 7, 'confirmed', 1),  # julien
+            # Marché Créateurs (3) — gratuit, entrée libre
+            (3, 0, 'confirmed', 1),  # charlie
+            (3, 1, 'confirmed', 1),  # diana
+            (3, 2, 'confirmed', 1),  # ethan
+            (3, 3, 'confirmed', 1),  # fiona
+            (3, 4, 'confirmed', 1),  # george
+            (3, 5, 'confirmed', 1),  # hugo
+            (3, 6, 'confirmed', 1),  # isabelle
+            (3, 7, 'confirmed', 1),  # julien
+            # Atelier Cuisine (4) — très petite capacité (16)
+            (4, 1, 'confirmed', 2),  # diana x2
+            (4, 2, 'confirmed', 1),  # ethan
+            (4, 3, 'confirmed', 2),  # fiona x2
+            (4, 6, 'pending',   1),  # isabelle
+            (4, 7, 'confirmed', 1),  # julien
+            # Stand-up Comedy (5) — événement passé
+            (5, 0, 'confirmed', 1),  # charlie
+            (5, 1, 'confirmed', 2),  # diana x2
+            (5, 2, 'confirmed', 1),  # ethan
+            (5, 4, 'cancelled', 1),  # george (annulé)
+            (5, 5, 'confirmed', 1),  # hugo
+        ]
+
+        for ev_idx, att_idx, reg_status, qty in REGISTRATIONS:
+            if ev_idx >= len(events) or att_idx >= len(attendees):
+                continue
+            Registration.objects.get_or_create(
+                event=events[ev_idx],
+                user=attendees[att_idx],
+                defaults={'status': reg_status, 'quantity': qty},
+            )
+
+    def _create_interests(self, events, attendees):
+        # (event_index, attendee_index) pairs — users who clicked "Intéressé" without registering
+        INTERESTS = [
+            (0, 1), (0, 3), (0, 6),  # Festival Électro
+            (1, 0), (1, 3), (1, 4), (1, 7),  # Conférence Tech
+            (2, 2), (2, 6),  # Concert Jazz
+            (3, 2), (3, 5),  # Marché Créateurs
+            (4, 0), (4, 4),  # Atelier Cuisine
+        ]
+        for ev_idx, att_idx in INTERESTS:
+            if ev_idx >= len(events) or att_idx >= len(attendees):
+                continue
+            events[ev_idx].interested_users.add(attendees[att_idx])

@@ -1,61 +1,66 @@
-import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useEffect, useMemo, useState } from 'react'
+import { X } from 'lucide-react'
 import api from '../api/axios'
+import { useAuth } from '../context/AuthContext'
+import EventCard from '../components/EventCard'
 import styles from './HomePage.module.css'
 
-function formatDate(start, end) {
-  const base = new Intl.DateTimeFormat('fr-FR', {
-    weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
-  }).format(new Date(start))
-  const startTime = new Intl.DateTimeFormat('fr-FR', { hour: '2-digit', minute: '2-digit' }).format(new Date(start))
-  if (!end) return `${base} à ${startTime}`
-  const endTime = new Intl.DateTimeFormat('fr-FR', { hour: '2-digit', minute: '2-digit' }).format(new Date(end))
-  return `${base} · ${startTime} → ${endTime}`
-}
-
-function EventCard({ event }) {
-  const navigate = useNavigate()
-  const imageUrl = event.cover_image
-    ? event.cover_image
-    : null
-
-  return (
-    <article className={styles.card} onClick={() => navigate(`/events/${event.id}`)}>
-      <div className={styles.cardImage}>
-        {imageUrl
-          ? <img src={imageUrl} alt={event.title} />
-          : <div className={styles.cardImageFallback} />
-        }
-        {event.is_sold_out && <span className={styles.soldOutBadge}>COMPLET</span>}
-      </div>
-      <div className={styles.cardBody}>
-        <h2 className={styles.cardTitle}>{event.title}</h2>
-        <p className={styles.cardDate}>{formatDate(event.date, event.end_date)}</p>
-        <p className={styles.cardLocation}>{event.location}</p>
-        <div className={styles.cardFooter}>
-          <span className={styles.cardPrice}>
-            {event.price === '0.00' || event.price === 0 ? 'Gratuit' : `${event.price} €`}
-          </span>
-          <span className={event.is_sold_out ? styles.spotsOut : styles.spotsLeft}>
-            {event.is_sold_out ? 'Complet' : `${event.spots_left} places restantes`}
-          </span>
-        </div>
-      </div>
-    </article>
-  )
-}
-
 export default function HomePage() {
+  const { user } = useAuth()
   const [events, setEvents] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [interests, setInterests] = useState({})
+
+  const [selectedCity, setSelectedCity] = useState(null)
+  const [onlyFree, setOnlyFree] = useState(false)
+  const [onlyUpcoming, setOnlyUpcoming] = useState(true)
 
   useEffect(() => {
     api.get('/api/events/')
-      .then(({ data }) => setEvents(data))
+      .then(({ data }) => {
+        setEvents(data)
+        const map = {}
+        data.forEach(e => { map[e.id] = e.is_interested ?? false })
+        setInterests(map)
+      })
       .catch(() => setError('Impossible de charger les événements.'))
       .finally(() => setLoading(false))
   }, [])
+
+  async function handleToggleInterest(eventId) {
+    if (!user) return
+    const prev = interests[eventId] ?? false
+    setInterests(m => ({ ...m, [eventId]: !prev }))
+    try {
+      await api.post(`/api/events/${eventId}/interest/`)
+    } catch {
+      setInterests(m => ({ ...m, [eventId]: prev }))
+    }
+  }
+
+  const cities = useMemo(() => {
+    const set = new Set(events.map(e => e.location.split(',')[0].trim()))
+    return [...set].sort()
+  }, [events])
+
+  const filteredEvents = useMemo(() => {
+    const now = new Date()
+    return events.filter(e => {
+      if (selectedCity && !e.location.startsWith(selectedCity)) return false
+      if (onlyFree && parseFloat(e.price) !== 0) return false
+      if (onlyUpcoming && new Date(e.date) < now) return false
+      return true
+    })
+  }, [events, selectedCity, onlyFree, onlyUpcoming])
+
+  const activeFilterCount = (selectedCity ? 1 : 0) + (onlyFree ? 1 : 0) + (!onlyUpcoming ? 1 : 0)
+
+  function clearFilters() {
+    setSelectedCity(null)
+    setOnlyFree(false)
+    setOnlyUpcoming(true)
+  }
 
   return (
     <main className={styles.page}>
@@ -63,6 +68,40 @@ export default function HomePage() {
         <h1>Les meilleurs événements<br /><span className={styles.accent}>près de chez toi</span></h1>
         <p>Découvre, réserve, profite.</p>
       </header>
+
+      {!loading && !error && (
+        <section className={styles.filters}>
+          <div className={styles.chips}>
+            <button
+              className={`${styles.chip} ${onlyUpcoming ? styles.chipActive : ''}`}
+              onClick={() => setOnlyUpcoming(v => !v)}
+            >
+              À venir
+            </button>
+            <button
+              className={`${styles.chip} ${onlyFree ? styles.chipActive : ''}`}
+              onClick={() => setOnlyFree(v => !v)}
+            >
+              Gratuit
+            </button>
+            <div className={styles.chipDivider} />
+            {cities.map(city => (
+              <button
+                key={city}
+                className={`${styles.chip} ${selectedCity === city ? styles.chipActive : ''}`}
+                onClick={() => setSelectedCity(selectedCity === city ? null : city)}
+              >
+                {city}
+              </button>
+            ))}
+            {activeFilterCount > 0 && (
+              <button className={styles.chipReset} onClick={clearFilters}>
+                <X size={12} /> Réinitialiser
+              </button>
+            )}
+          </div>
+        </section>
+      )}
 
       {loading && (
         <div className={styles.center}>
@@ -72,14 +111,35 @@ export default function HomePage() {
 
       {error && <p className={styles.errorMsg}>{error}</p>}
 
-      {!loading && !error && events.length === 0 && (
-        <p className={styles.empty}>Aucun événement disponible pour le moment.</p>
+      {!loading && !error && filteredEvents.length === 0 && (
+        <div className={styles.emptyState}>
+          <p className={styles.empty}>
+            {events.length === 0
+              ? 'Aucun événement disponible pour le moment.'
+              : 'Aucun événement ne correspond à tes filtres.'}
+          </p>
+          {events.length > 0 && activeFilterCount > 0 && (
+            <button className={styles.chip} onClick={clearFilters}>Voir tous les événements</button>
+          )}
+        </div>
       )}
 
-      {!loading && !error && events.length > 0 && (
-        <div className={styles.grid}>
-          {events.map(event => <EventCard key={event.id} event={event} />)}
-        </div>
+      {!loading && !error && filteredEvents.length > 0 && (
+        <>
+          <p className={styles.resultCount}>
+            {filteredEvents.length} événement{filteredEvents.length > 1 ? 's' : ''}
+          </p>
+          <div className={styles.grid}>
+            {filteredEvents.map(event => (
+              <EventCard
+                key={event.id}
+                event={event}
+                isInterested={interests[event.id] ?? false}
+                onToggleInterest={user ? handleToggleInterest : undefined}
+              />
+            ))}
+          </div>
+        </>
       )}
     </main>
   )
