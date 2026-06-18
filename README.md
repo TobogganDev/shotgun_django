@@ -85,17 +85,24 @@ flowchart TB
 
     subgraph EVENTS["🎫 events — Events"]
       direction TB
-      E_URL["api/events/<br/>list · create · detail · update"]:::url
-      E_URL --> EVS["EventViewSet<br/>+ @action register"]:::view
-      EVENT["Event"]:::model
+      E_URL["api/events/<br/>list · create · detail · update · delete"]:::url
+      E_URL --> EVS["EventViewSet"]:::view
+      EVS -. "register" .-> REGM
+      EVS -. "interest / my_interests" .-> EVENT
+      EVS -. "registrants" .-> REGM
+      EVS -. "join_waitlist / leave_waitlist<br/>waitlist_position" .-> WLE
+      EVENT["Event<br/><i>capacity · is_sold_out · interested_users</i>"]:::model
     end
 
-    subgraph TICKETS["🎟️ tickets — Tickets"]
+    subgraph TICKETS["🎟️ tickets — Tickets & Waitlist"]
       direction TB
-      T_URL["api/tickets/mine/<br/>api/tickets/{code}/qr/"]:::url
+      T_URL["api/tickets/mine/<br/>api/tickets/waitlist/<br/>api/tickets/{id}/cancel/<br/>api/tickets/{code}/qr/"]:::url
       T_URL --> MTV["MyTicketsView"]:::view
+      T_URL --> MWLV["MyWaitlistView"]:::view
+      T_URL --> CRV["CancelRegistrationView<br/><i>auto-promotes waitlist</i>"]:::view
       T_URL --> QRV["TicketQRView"]:::view
-      REGM["Registration<br/><i>ticket_code (UUID)</i>"]:::model
+      REGM["Registration<br/><i>status · ticket_code (UUID)</i>"]:::model
+      WLE["WaitlistEntry<br/><i>position · joined_at</i>"]:::model
     end
 
     ROOT --> A_URL
@@ -106,14 +113,18 @@ flowchart TB
     MEV --> USER
     EVS --> EVENT
     MTV --> REGM
+    MWLV --> WLE
     QRV --> REGM
-    EVS -. "register" .-> REGM
+    CRV --> REGM
+    CRV -. "promotes" .-> WLE
 
     USER[("auth.User")]:::user
     PROFILE -- "1–1" --> USER
     EVENT -- "organizer" --> USER
     REGM -- "user" --> USER
     REGM -- "event" --> EVENT
+    WLE -- "user" --> USER
+    WLE -- "event" --> EVENT
 
     classDef entry fill:#1f2937,stroke:#111,color:#fff,font-weight:bold;
     classDef url fill:#eef2ff,stroke:#4f46e5,color:#1e1b4b;
@@ -128,6 +139,17 @@ flowchart TB
 
 > **Legend** — blue = URLs · white = DRF views · purple = models · amber = Django `User`.
 > Solid arrow = ORM / relation · dotted arrow = custom action.
+
+### Waitlist behaviour
+
+When an event reaches capacity (`is_sold_out = True`), attendees can join a queue. The first person on the queue is **automatically promoted** to a confirmed registration whenever someone cancels their ticket.
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `api/events/{id}/join_waitlist/` | POST | Join the waitlist (only when sold out) |
+| `api/events/{id}/leave_waitlist/` | DELETE | Leave the waitlist |
+| `api/events/{id}/waitlist_position/` | GET | Check your current position |
+| `api/tickets/waitlist/` | GET | All your waitlist entries |
 
 ---
 
