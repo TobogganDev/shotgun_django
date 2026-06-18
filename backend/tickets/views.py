@@ -1,9 +1,10 @@
 import io
 import qrcode
 from django.http import HttpResponse
-from rest_framework import generics, permissions
+from rest_framework import generics, permissions, status
 from rest_framework.views import APIView
-from rest_framework.exceptions import NotFound, PermissionDenied
+from rest_framework.response import Response
+from rest_framework.exceptions import NotFound
 from .models import Registration
 from .serializers import RegistrationSerializer
 
@@ -14,6 +15,21 @@ class MyTicketsView(generics.ListAPIView):
 
     def get_queryset(self):
         return Registration.objects.filter(user=self.request.user).select_related('event')
+
+
+class CancelRegistrationView(APIView):
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def patch(self, request, pk):
+        try:
+            registration = Registration.objects.get(pk=pk, user=request.user)
+        except Registration.DoesNotExist:
+            raise NotFound()
+        if registration.status != 'confirmed':
+            return Response({'detail': 'Ce billet ne peut pas être annulé.'}, status=status.HTTP_400_BAD_REQUEST)
+        registration.status = 'cancelled'
+        registration.save()
+        return Response({'detail': 'Inscription annulée.'})
 
 
 class TicketQRView(APIView):

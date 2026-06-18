@@ -4,7 +4,7 @@ from rest_framework.response import Response
 
 from tickets.models import Registration
 from .models import Event
-from .serializers import EventSerializer, AttendeeSerializer
+from .serializers import EventSerializer
 
 
 class IsOrganizer(permissions.BasePermission):
@@ -36,20 +36,14 @@ class EventViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(organizer=self.request.user)
 
-    @action(detail=True, methods=['get'], permission_classes=[permissions.IsAuthenticated])
-    def attendees(self, request, pk=None):
+    @action(detail=True, methods=['get'], url_path='registrants', permission_classes=[permissions.IsAuthenticated])
+    def registrants(self, request, pk=None):
         event = self.get_object()
         if event.organizer != request.user:
-            return Response({'detail': "Accès refusé."}, status=status.HTTP_403_FORBIDDEN)
-
-        registrations = event.registrations.select_related('user').order_by('-registered_at')
-        serializer = AttendeeSerializer(registrations, many=True)
-        confirmed = sum(1 for r in registrations if r.status == 'confirmed')
-        return Response({
-            'total': registrations.count(),
-            'confirmed': confirmed,
-            'attendees': serializer.data,
-        })
+            return Response({'detail': 'Non autorisé.'}, status=status.HTTP_403_FORBIDDEN)
+        from tickets.serializers import RegistrantSerializer
+        queryset = event.registrations.select_related('user').order_by('-registered_at')
+        return Response(RegistrantSerializer(queryset, many=True).data)
 
     @action(detail=False, methods=['get'], permission_classes=[permissions.IsAuthenticated])
     def my_interests(self, request):

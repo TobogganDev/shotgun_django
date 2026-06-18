@@ -15,3 +15,12 @@ class RegistrationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Registration
         fields = ('id', 'event', 'status', 'quantity', 'ticket_code', 'registered_at')
+
+
+class RegistrantSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(source='user.username')
+    email = serializers.CharField(source='user.email')
+
+    class Meta:
+        model = Registration
+        fields = ('id', 'username', 'email', 'status', 'quantity', 'registered_at')
