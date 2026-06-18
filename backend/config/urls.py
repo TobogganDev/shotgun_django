@@ -5,7 +5,7 @@ from django.conf.urls.static import static
 from rest_framework.routers import DefaultRouter
 
 from events.views import EventViewSet
-from tickets.views import MyTicketsView, TicketQRView
+from tickets.views import MyTicketsView, TicketQRView, CancelRegistrationView
 
 router = DefaultRouter()
 router.register(r'events', EventViewSet, basename='event')
@@ -16,6 +16,7 @@ urlpatterns = [
     path('api/auth/', include('accounts.urls')),
     path('api/tickets/mine/', MyTicketsView.as_view(), name='my-tickets'),
     path('api/tickets/<uuid:ticket_code>/qr/', TicketQRView.as_view(), name='ticket-qr'),
+    path('api/tickets/<int:pk>/cancel/', CancelRegistrationView.as_view(), name='ticket-cancel'),
 ]
 
 if settings.DEBUG:

@@ -36,6 +36,15 @@ class EventViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(organizer=self.request.user)
 
+    @action(detail=True, methods=['get'], url_path='registrants', permission_classes=[permissions.IsAuthenticated])
+    def registrants(self, request, pk=None):
+        event = self.get_object()
+        if event.organizer != request.user:
+            return Response({'detail': 'Non autorisé.'}, status=status.HTTP_403_FORBIDDEN)
+        from tickets.serializers import RegistrantSerializer
+        queryset = event.registrations.select_related('user').order_by('-registered_at')
+        return Response(RegistrantSerializer(queryset, many=True).data)
+
     @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
     def register(self, request, pk=None):
         event = self.get_object()
