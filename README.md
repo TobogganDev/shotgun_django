@@ -4,7 +4,65 @@ A ticketing platform with a Django REST API backend and a React/Vite frontend.
 
 ---
 
-## Prerequisites
+## 🐳 Quick start with Docker (recommended)
+
+The whole stack (PostgreSQL + Django/Gunicorn + React served by Nginx) runs with
+a single command. You only need **Docker** and **Docker Compose**.
+
+```bash
+# 1. Copy the env
+cp .env.example .env
+
+# 2. Build and start everything
+docker compose up --build
+```
+
+Then open **http://localhost:8080**.
+
+| URL | Service |
+|-----|---------|
+| http://localhost:8080 | React frontend (Nginx) |
+| http://localhost:8080/api/ | Django REST API (proxied) |
+| http://localhost:8080/admin/ | Django admin (proxied) |
+
+### Architecture
+
+```
+                 ┌──────────────────────────────────────────┐
+  Browser  ─────▶│  frontend (Nginx :80 → host :8080)         │
+                 │   • serves the built React SPA             │
+                 │   • /api, /admin, /static → proxy backend  │
+                 │   • /media → shared volume                 │
+                 └───────────────┬────────────────────────────┘
+                                 │ (internal network)
+                 ┌───────────────▼────────────────────────────┐
+                 │  backend (Django + Gunicorn :8000)          │
+                 │   • migrate + collectstatic on startup      │
+                 │   • WhiteNoise for /static                  │
+                 └───────────────┬────────────────────────────┘
+                                 │
+                 ┌───────────────▼────────────────────────────┐
+                 │  db (PostgreSQL 16, persistent volume)      │
+                 └─────────────────────────────────────────────┘
+```
+
+### Useful commands
+
+```bash
+docker compose up -d --build          # run detached
+docker compose logs -f backend        # follow backend logs
+docker compose exec backend python manage.py createsuperuser
+docker compose exec backend python manage.py seed --flush
+docker compose down                   # stop (keeps data volumes)
+docker compose down -v                # stop and wipe the database/media volumes
+```
+
+Data persists across restarts in the `postgres_data`, `media_volume`, and
+`static_volume` Docker volumes.
+
+---
+
+## Prerequisites (local, without Docker)
 
 - Python 3.10+
 - Node.js 18+
