@@ -20,7 +20,10 @@ cd backend
 
 # Create and activate a virtual environment
 python3 -m venv ../venv
+MacOS :
 source ../venv/bin/activate
+Windows : 
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force; ..\venv\Scripts\Activate.ps1
 
 # Install dependencies
 pip install -r requirements.txt
@@ -37,6 +40,34 @@ To create a superuser for the Django admin:
 ```bash
 python manage.py createsuperuser
 ```
+
+---
+
+## Seeding mock data
+
+To populate the database with demo users, events, and registrations:
+
+```bash
+# Add demo data
+python manage.py seed
+
+# Wipe previously seeded data, then re-seed
+python manage.py seed --flush
+```
+
+This creates:
+
+- **2 organizers** and **5 attendees** (with the correct roles)
+- **6 events** with varied prices, venues, dates, and **cover images** (including one past event)
+- **~19 registrations** with mixed statuses (`confirmed`, `pending`, `cancelled`)
+
+All seeded users share the same password: **`password123`**
+
+The command is idempotent (running it again won't create duplicates), and `--flush` only removes the seeded demo data — your superuser is left untouched.
+
+The demo cover images are committed in `backend/events/seed_images/` and copied into
+`backend/media/events/` automatically when you run the command, so they display out of
+the box. Real user uploads under `media/` stay out of version control.
 
 ---
 

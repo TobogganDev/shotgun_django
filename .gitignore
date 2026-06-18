@@ -3,7 +3,12 @@ __pycache__/
 *.pyc
 *.pyo
 db.sqlite3
-media/
+# Ignore user-uploaded media, but keep the events/ folder placeholder so the
+# seed command has somewhere to copy demo images on a fresh clone.
+backend/media/*
+!backend/media/events/
+backend/media/events/*
+!backend/media/events/.gitkeep
 staticfiles/
 .env
 *.egg-info/
