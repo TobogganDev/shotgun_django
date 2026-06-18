@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { X } from 'lucide-react'
 import api from '../api/axios'
 import { useAuth } from '../context/AuthContext'
@@ -11,6 +12,9 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [interests, setInterests] = useState({})
+
+  const [searchParams] = useSearchParams()
+  const searchQuery = (searchParams.get('q') ?? '').toLowerCase().trim()
 
   const [selectedCity, setSelectedCity] = useState(null)
   const [onlyFree, setOnlyFree] = useState(false)
@@ -47,12 +51,16 @@ export default function HomePage() {
   const filteredEvents = useMemo(() => {
     const now = new Date()
     return events.filter(e => {
+      if (searchQuery) {
+        const haystack = `${e.title} ${e.location} ${e.description ?? ''}`.toLowerCase()
+        if (!haystack.includes(searchQuery)) return false
+      }
       if (selectedCity && !e.location.startsWith(selectedCity)) return false
       if (onlyFree && parseFloat(e.price) !== 0) return false
       if (onlyUpcoming && new Date(e.date) < now) return false
       return true
     })
-  }, [events, selectedCity, onlyFree, onlyUpcoming])
+  }, [events, searchQuery, selectedCity, onlyFree, onlyUpcoming])
 
   const activeFilterCount = (selectedCity ? 1 : 0) + (onlyFree ? 1 : 0) + (!onlyUpcoming ? 1 : 0)
 

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation, useSearchParams } from "react-router-dom";
 import { Heart } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import "../App.css";
@@ -46,10 +46,19 @@ function UserMenu({ user, onLogout }) {
 export default function Navbar() {
 	const { user, logout } = useAuth();
 	const navigate = useNavigate();
+	const location = useLocation();
+	const [searchParams] = useSearchParams();
+	const isHome = location.pathname === '/';
+	const searchQuery = isHome ? (searchParams.get('q') ?? '') : '';
 
 	function handleLogout() {
 		logout();
 		navigate("/");
+	}
+
+	function handleSearch(e) {
+		const val = e.target.value;
+		navigate(val ? `/?q=${encodeURIComponent(val)}` : '/');
 	}
 
 	return (
@@ -66,7 +75,12 @@ export default function Navbar() {
 						<circle cx="11" cy="11" r="8" />
 						<path d="m21 21-4.35-4.35" />
 					</svg>
-					<input type="search" placeholder="Rechercher un événement…" />
+					<input
+						type="search"
+						placeholder="Rechercher un événement…"
+						value={searchQuery}
+						onChange={handleSearch}
+					/>
 				</div>
 
 				<div className="navbar-links">
