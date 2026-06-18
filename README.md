@@ -24,6 +24,9 @@ Then open **http://localhost:8080**.
 | http://localhost:8080 | React frontend (Nginx) |
 | http://localhost:8080/api/ | Django REST API (proxied) |
 | http://localhost:8080/admin/ | Django admin (proxied) |
+| http://localhost:8080/api/docs/ | Swagger UI |
+| http://localhost:8080/api/redoc/ | ReDoc |
+| http://localhost:8080/api/schema/ | OpenAPI schema (JSON/YAML) |
 
 ### Architecture
 
@@ -125,6 +128,20 @@ flowchart TB
 
 > **Legend** — blue = URLs · white = DRF views · purple = models · amber = Django `User`.
 > Solid arrow = ORM / relation · dotted arrow = custom action.
+
+---
+
+## 📖 API Documentation
+
+Interactive docs are served automatically by the backend:
+
+| URL | Description |
+|-----|-------------|
+| `/api/docs/` | Swagger UI — browse and test endpoints interactively |
+| `/api/redoc/` | ReDoc — clean, readable reference |
+| `/api/schema/` | Raw OpenAPI 3 schema (JSON by default, append `?format=yaml` for YAML) |
+
+When running locally the Swagger UI is at **http://localhost:8000/api/docs/**.
 
 ---
 
