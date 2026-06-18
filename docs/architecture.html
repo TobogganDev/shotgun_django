@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <title>Shotgun Django — URLs &amp; Models</title>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <style>
+    body { font-family: -apple-system, Segoe UI, Roboto, sans-serif; background: #fff; margin: 0; padding: 24px; }
+    h1 { font-size: 20px; font-weight: 600; }
+    .hint { color: #666; font-size: 13px; margin-bottom: 16px; }
+    .mermaid { display: flex; justify-content: center; }
+    .mermaid .cluster-label, .mermaid .cluster-label p, .mermaid .cluster-label span { fill: #000 !important; color: #000 !important; }
+    /* Labels des flèches (1-1, organizer, user...) en noir + fond blanc lisible */
+    .mermaid .edgeLabel, .mermaid .edgeLabel p, .mermaid .edgeLabel span { color: #000 !important; background-color: #fff !important; }
+  </style>
+</head>
+<body>
+  <pre class="mermaid">
+flowchart TB
+    ROOT["config/urls.py<br/><i>API REST</i>"]:::entry
+
+    %% ===================== ACCOUNTS =====================
+    subgraph ACCOUNTS["🔑 accounts — Authentification & Profils"]
+      direction TB
+      A_URL["api/auth/<br/>register · login · refresh · me"]:::url
+      A_URL --> REGV["RegisterView"]:::view
+      A_URL --> JWTV["Token Obtain / Refresh<br/>(login JWT)"]:::view
+      A_URL --> MEV["MeView"]:::view
+      PROFILE["Profile<br/><i>role: organizer / attendee</i>"]:::model
+    end
+
+    %% ===================== EVENTS =====================
+    subgraph EVENTS["🎫 events — Événements"]
+      direction TB
+      E_URL["api/events/<br/>list · create · detail · update"]:::url
+      E_URL --> EVS["EventViewSet<br/>+ @action register"]:::view
+      EVENT["Event"]:::model
+    end
+
+    %% ===================== TICKETS =====================
+    subgraph TICKETS["🎟️ tickets — Billets"]
+      direction TB
+      T_URL["api/tickets/mine/<br/>api/tickets/{code}/qr/"]:::url
+      T_URL --> MTV["MyTicketsView"]:::view
+      T_URL --> QRV["TicketQRView"]:::view
+      REGM["Registration<br/><i>ticket_code (UUID)</i>"]:::model
+    end
+
+    %% --- routing ---
+    ROOT --> A_URL
+    ROOT --> E_URL
+    ROOT --> T_URL
+
+    %% --- view -> model (ORM) ---
+    REGV --> PROFILE
+    MEV --> USER
+    EVS --> EVENT
+    MTV --> REGM
+    QRV --> REGM
+    EVS -. "register" .-> REGM
+
+    %% --- shared user + relations ---
+    USER[("auth.User")]:::user
+    PROFILE -- "1–1" --> USER
+    EVENT -- "organizer" --> USER
+    REGM -- "user" --> USER
+    REGM -- "event" --> EVENT
+
+    classDef entry fill:#1f2937,stroke:#111,color:#fff,font-weight:bold;
+    classDef url fill:#eef2ff,stroke:#4f46e5,color:#1e1b4b;
+    classDef view fill:#ffffff,stroke:#64748b,color:#0f172a;
+    classDef model fill:#f5f0ff,stroke:#7c3aed,color:#2e1065,font-weight:bold;
+    classDef user fill:#fef3c7,stroke:#d97706,color:#78350f,font-weight:bold;
+
+    style ACCOUNTS fill:#fafaff,stroke:#c7d2fe,color:#000;
+    style EVENTS fill:#fafaff,stroke:#c7d2fe,color:#000;
+    style TICKETS fill:#fafaff,stroke:#c7d2fe,color:#000;
+  </pre>
+
+  <p class="hint" style="margin-top:24px">
+    <b>Légende :</b>
+    <span style="background:#eef2ff;padding:2px 6px;border:1px solid #4f46e5;border-radius:3px">URLs</span>
+    <span style="background:#fff;padding:2px 6px;border:1px solid #64748b;border-radius:3px">Vues (DRF)</span>
+    <span style="background:#f5f0ff;padding:2px 6px;border:1px solid #7c3aed;border-radius:3px">Models</span>
+    <span style="background:#fef3c7;padding:2px 6px;border:1px solid #d97706;border-radius:3px">User (Django)</span>
+  </p>
+
+  <script>
+    mermaid.initialize({ startOnLoad: true, theme: 'neutral', flowchart: { curve: 'basis', nodeSpacing: 45, rankSpacing: 55 } });
+  </script>
+</body>
+</html>
